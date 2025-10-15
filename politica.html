@@ -1,0 +1,140 @@
+<script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+        return cell !== "" && cell != null;
+    }
+    function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], {
+                    type: "base64",
+                });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, {
+                    header: 1,
+                    blankrows: false,
+                    defval: "",
+                });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter((row) =>
+                    row.some(filledCell)
+                );
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex(
+                    (row, index) =>
+                        row.filter(filledCell).length >=
+                        filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                    headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(
+                    filteredData.slice(headerRowIndex)
+                ); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+    }
+</script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Política de Privacidade - CallSafe</title>
+    </head>
+    <body>
+        <h1>Política de Privacidade</h1>
+        <p><strong>Última atualização: 15/10/2025</strong></p>
+        <p>
+            A sua privacidade é importante para nós. Esta Política de
+            Privacidade descreve como o aplicativo CallSafe coleta, usa,
+            armazena e protege os dados pessoais dos usuários.
+        </p>
+
+        <h2>1. Informações Coletadas</h2>
+        <p>O CallSafe pode coletar as seguintes informações:</p>
+        <ul>
+            <li>
+                Comandos de voz (processados localmente para ativar funções do
+                app);
+            </li>
+            <li>
+                Dados de localização (se necessário para funcionalidades de
+                segurança);
+            </li>
+            <li>
+                Informações de dispositivo (modelo, sistema operacional, status
+                do Bluetooth e permissões);
+            </li>
+            <li>
+                Nome e e-mail (quando fornecidos para suporte ou cadastro
+                opcional).
+            </li>
+        </ul>
+
+        <h2>2. Uso das Informações</h2>
+        <p>As informações coletadas são usadas para:</p>
+        <ul>
+            <li>Ativar gatilhos de segurança;</li>
+            <li>Personalizar funcionalidades conforme suas preferências;</li>
+            <li>Melhorar o desempenho e a segurança do app;</li>
+            <li>Oferecer suporte técnico, quando solicitado.</li>
+        </ul>
+
+        <h2>3. Compartilhamento com Terceiros</h2>
+        <p>O CallSafe não compartilha dados pessoais com terceiros, salvo:</p>
+        <ul>
+            <li>Quando exigido por lei;</li>
+            <li>
+                Com serviços como Firebase ou Google (caso estejam integrados no
+                futuro, sob suas próprias políticas).
+            </li>
+        </ul>
+
+        <h2>4. Armazenamento e Segurança</h2>
+        <ul>
+            <li>
+                Dados sensíveis são armazenados localmente no dispositivo do
+                usuário sempre que possível;
+            </li>
+            <li>O app segue boas práticas de segurança e criptografia;</li>
+            <li>
+                O usuário pode solicitar a exclusão de seus dados a qualquer
+                momento, se houver cadastro opcional.
+            </li>
+        </ul>
+
+        <h2>5. Permissões do Dispositivo</h2>
+        <p>O app poderá solicitar permissões como:</p>
+        <ul>
+            <li>Microfone (para comandos de voz);</li>
+            <li>Localização (para alertas de segurança);</li>
+            <li>Bluetooth (para integração com o carro).</li>
+        </ul>
+        <p>
+            Essas permissões são essenciais para o funcionamento correto do
+            CallSafe. Nenhum dado é coletado sem consentimento.
+        </p>
+
+        <h2>6. Contato</h2>
+        <p>
+            Para dúvidas sobre esta Política de Privacidade, entre em contato:
+        </p>
+        <p>📧 callsavingoficial@gmail.com</p>
+    </body>
+</html>
